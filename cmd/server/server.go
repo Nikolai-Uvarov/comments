@@ -1,11 +1,9 @@
-package main
-
+//сервер сервиса комментариев
 package main
 
 import (
-	"NewsAgg/pkg/api"
-	"NewsAgg/pkg/db/postgres"
-	"NewsAgg/pkg/rss"
+	"comments/pkg/api"
+	"comments/pkg/db/postgres"
 	"log"
 	"net/http"
 )
@@ -16,10 +14,7 @@ func main() {
 	//db := dbmock.New()
 	db := postgres.New()
 
-	//Запуск воркера, прослушивающего и сохраняющего в БД RSS-ленты
-	rss.Collect(db)
-
-	// Создание объекта API, использующего БД в памяти.
+	// Создание объекта API, использующего БД.
 	api := api.New(db)
 
 	// Запуск сетевой службы и HTTP-сервера
@@ -28,5 +23,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
 }
