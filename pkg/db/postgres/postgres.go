@@ -62,7 +62,8 @@ func (db *DB) GetComments(id int) ([]obj.Comment, error) {
 			&c.ID,
 			&c.PostID,
 			&c.CommentID,
-			&c.Text)
+			&c.Text,
+			&c.Censored)
 
 		if err != nil {
 			return nil, err
