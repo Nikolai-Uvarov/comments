@@ -44,10 +44,31 @@ func (db *DB) SaveComment(c obj.Comment) error {
 	return nil
 }
 
-// Возвращает массив комментариев по ID новости
+// Возвращает массив комментариев по ID новости, содержащий вложенные комментарии
 func (db *DB) GetComments(id int) ([]obj.Comment, error) {
 
-	rows, err := db.DB.Query(db.ctx, `SELECT * FROM comments ORDER BY ID DESC;`) 
+	allComments, err:= db.GetAllComments()
+
+	if err != nil {
+		return nil, err
+	}
+
+	var comments []obj.Comment
+
+	for _, c := range allComments {
+		if c.PostID == id {
+			c.BuildCommentTree(allComments)
+			comments = append(comments, c)
+		}
+	}
+
+	return comments, nil
+}
+
+// Возвращает массив всех комментариев из базы
+func (db *DB) GetAllComments() ([]obj.Comment, error) {
+
+	rows, err := db.DB.Query(db.ctx, `SELECT * FROM comments ORDER BY ID;`) 
 
 	if err != nil {
 		return nil, err
@@ -71,14 +92,18 @@ func (db *DB) GetComments(id int) ([]obj.Comment, error) {
 		allComments = append(allComments, c)
 	}
 
-	var comments []obj.Comment
+	return allComments, rows.Err()
+}
 
-	for _, c := range allComments {
-		if c.PostID == id {
-			c.BuildCommentTree(allComments)
-			comments = append(comments, c)
-		}
+//Записывает в базу признак цензуры по id комментария.
+func (db *DB) SetCensored(id int) error {
+
+	_, err := db.DB.Exec(db.ctx,
+		`UPDATE comments SET censored = true WHERE id = ($1);`, id)
+
+	if err != nil {
+		return err
 	}
 
-	return comments, rows.Err()
+	return nil
 }
