@@ -83,8 +83,7 @@ func (db *DB) GetAllComments() ([]obj.Comment, error) {
 			&c.ID,
 			&c.PostID,
 			&c.CommentID,
-			&c.Text,
-			&c.Censored)
+			&c.Text)
 
 		if err != nil {
 			return nil, err
@@ -93,17 +92,4 @@ func (db *DB) GetAllComments() ([]obj.Comment, error) {
 	}
 
 	return allComments, rows.Err()
-}
-
-//Записывает в базу признак цензуры по id комментария.
-func (db *DB) SetCensored(id int) error {
-
-	_, err := db.DB.Exec(db.ctx,
-		`UPDATE comments SET censored = true WHERE id = ($1);`, id)
-
-	if err != nil {
-		return err
-	}
-
-	return nil
 }

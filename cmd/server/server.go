@@ -2,7 +2,6 @@
 package main
 
 import (
-	"comments/cmd/censor"
 	"comments/pkg/api"
 	"comments/pkg/db/postgres"
 	"log"
@@ -18,12 +17,9 @@ func main() {
 	// Создание объекта API, использующего БД.
 	api := api.New(db)
 
-	//запускаем в отдельном потоке цензор
-	go censor.Censore(db)
-
 	// Запуск сетевой службы и HTTP-сервера
 	// на всех локальных IP-адресах на порту 8080.
-	err := http.ListenAndServe(":8080", api.Router())
+	err := http.ListenAndServe(":9595", api.Router())
 	if err != nil {
 		log.Fatal(err)
 	}

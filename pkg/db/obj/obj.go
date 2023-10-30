@@ -7,7 +7,6 @@ type Comment struct {
 	CommentID int       //ID комментария, к которому привязан данный коммент, если этот комментарий является ответом на другой комментарий
 	Text      string    //Текст комментария
 	Answers   []Comment //Ответы на данный комментарий
-	Censored  bool
 }
 
 type DB interface {
