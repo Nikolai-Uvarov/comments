@@ -1,10 +1,11 @@
 package api
 
 import (
+	"comments/pkg/db/obj"
+	"context"
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"comments/pkg/db/obj"
 
 	"github.com/gorilla/mux"
 )
@@ -34,16 +35,10 @@ func (api *API) endpoints() {
 	api.r.HandleFunc("/comments", api.commentsByPost).Methods(http.MethodGet)
 	api.r.HandleFunc("/add", api.addComment).Methods(http.MethodPost)
 	api.r.Use(api.HeadersMiddleware)
+	api.r.Use(api.RequestIDMiddleware)
+	api.r.Use(api.LoggingMiddleware)
 }
 
-// HeadersMiddleware устанавливает заголовки ответа сервера.
-func (api *API) HeadersMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
-		w.Header().Set("Manual-Header", "I love you")
-		next.ServeHTTP(w, r)
-	})
-}
 
 // commentsByPost возвращает все комментарии по id новости.
 func (api *API) commentsByPost(w http.ResponseWriter, r *http.Request) {
@@ -61,8 +56,16 @@ func (api *API) commentsByPost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+	var ans = struct {
+		Comments  []obj.Comment
+		RequestID any
+	}{
+		Comments:  comments,
+		RequestID: getRequestID(r.Context()),
+	}
 	// Отправка данных клиенту в формате JSON.
-	json.NewEncoder(w).Encode(comments)
+	json.NewEncoder(w).Encode(ans)
 }
 
 // addComment создает новый комментарий. В теле request должен быть указан id новости или комментария
@@ -80,5 +83,18 @@ func (api *API) addComment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	var ans = struct {
+		RequestID any
+	}{
+		RequestID: getRequestID(r.Context()),
+	}
+	
+	json.NewEncoder(w).Encode(ans)
+
 	w.WriteHeader(http.StatusOK)
+}
+
+
+func getRequestID(ctx context.Context) any {
+	return ctx.Value(contextKey("requestID"))
 }
