@@ -1,6 +1,7 @@
+//MiddleWare для обработки сквозного id запроса, логирования запросов и установки заголовков ответа
 package api
 
-//MiddleWare
+
 
 import (
 	"context"

@@ -1,3 +1,4 @@
+//api сервера сервиса комментариев
 package api
 
 import (
