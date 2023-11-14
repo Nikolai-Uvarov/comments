@@ -67,6 +67,7 @@ func (api *API) commentsByPost(w http.ResponseWriter, r *http.Request) {
 	}
 	// Отправка данных клиенту в формате JSON.
 	json.NewEncoder(w).Encode(ans)
+	w.WriteHeader(http.StatusOK)
 }
 
 // addComment создает новый комментарий. В теле request должен быть указан id новости или комментария

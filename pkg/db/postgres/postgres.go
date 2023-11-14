@@ -20,8 +20,9 @@ func New() *DB {
 	db.ctx = context.Background()
 	// Подключение к БД
 	dbpass := os.Getenv("dbpass")
+	dbhost := os.Getenv("dbhost")
 	var err error
-	db.DB, err = pgxpool.Connect(db.ctx, "postgres://postgres:"+dbpass+"@192.168.1.35:5432/comments")
+	db.DB, err = pgxpool.Connect(db.ctx, "postgres://postgres:"+dbpass+"@"+dbhost)
 
 	if err != nil {
 		log.Fatalf("Unable to connect to database: %v\n", err)
